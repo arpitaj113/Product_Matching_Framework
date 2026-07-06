@@ -1,0 +1,16 @@
+from models.embedding_network import EmbeddingNet
+
+model = EmbeddingNet()
+
+total = sum(p.numel() for p in model.parameters())
+trainable = sum(
+    p.numel()
+    for p in model.parameters()
+    if p.requires_grad
+)
+
+print()
+
+print("Total Parameters:", total)
+
+print("Trainable Parameters:", trainable)

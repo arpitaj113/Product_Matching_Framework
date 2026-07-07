@@ -16,9 +16,9 @@ from models.embedding_network import EmbeddingNet
 # -----------------------
 # Configuration
 # -----------------------
-DATASET_ROOT = "dataset/Stanford_Online_Products"
-TRAIN_FILE = os.path.join(DATASET_ROOT, "Ebay_train.txt")
+DATASET_ROOT = "/content/drive/MyDrive/Stanford_Online_Products"
 
+TRAIN_FILE = os.path.join(DATASET_ROOT, "Ebay_train.txt")
 BATCH_SIZE = 32
 EPOCHS = 10
 LEARNING_RATE = 1e-3

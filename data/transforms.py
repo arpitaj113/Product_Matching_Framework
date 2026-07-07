@@ -24,3 +24,4 @@ test_transform = transforms.Compose([
         std=[0.229,0.224,0.225]
     )
 ])
+inference_transform = test_transform

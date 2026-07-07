@@ -16,14 +16,14 @@ from models.embedding_network import EmbeddingNet
 # -----------------------
 # Configuration
 # -----------------------
-DATASET_ROOT = "/content/drive/MyDrive/Stanford_Online_Products"
+DATASET_ROOT = "/content/Stanford_Online_Products"
 
 TRAIN_FILE = os.path.join(DATASET_ROOT, "Ebay_train.txt")
 BATCH_SIZE = 32
 EPOCHS = 10
 LEARNING_RATE = 1e-3
 EMBEDDING_DIM = 128
-MODEL_SAVE_PATH = "saved_models/triplet_model.pth"
+MODEL_SAVE_PATH = "/content/drive/MyDrive/ProductMatchingModels/triplet_model.pth"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"\nUsing Device: {device}")
@@ -41,7 +41,9 @@ train_loader = DataLoader(
     train_dataset,
     batch_size=BATCH_SIZE,
     shuffle=True,
-    num_workers=0
+    num_workers=2,
+    pin_memory=True,
+    persistent_workers=True
 )
 
 # -----------------------

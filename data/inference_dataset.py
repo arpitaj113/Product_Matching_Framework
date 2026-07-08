@@ -31,29 +31,27 @@ class SOPInferenceDataset(Dataset):
 
         for _, row in df.iterrows():
 
-    image_path = os.path.join(
-        dataset_root,
-        row["path"]
-    )
+            image_path = os.path.join(
+                dataset_root,
+                row["path"]
+            )
 
-    self.samples.append(
-        (
-            image_path,
-            int(row["class_id"])
-        )
-    )
+            self.samples.append(
+                (
+                    image_path,
+                    int(row["class_id"])
+                )
+            )
 
-# ---------------------------------------------------------
-# TEMPORARY: Limit dataset size for faster embedding generation
-# Remove this after your presentation to use the full dataset.
-# ---------------------------------------------------------
+        # ---------------------------------------------------------
+        # TEMPORARY: Use only first 5000 images for demo
+        # ---------------------------------------------------------
+        MAX_IMAGES = 5000
 
-MAX_IMAGES = 5000
+        if MAX_IMAGES is not None:
+            self.samples = self.samples[:MAX_IMAGES]
 
-if MAX_IMAGES is not None:
-    self.samples = self.samples[:MAX_IMAGES]
-
-print(f"\nUsing {len(self.samples)} images for inference.")
+        print(f"\nUsing {len(self.samples)} images for inference.")
 
     def __len__(self):
         return len(self.samples)

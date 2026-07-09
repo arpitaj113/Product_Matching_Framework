@@ -1,7 +1,15 @@
 import os
 import sys
+import time
+import tempfile
 
-# Add project root to Python path
+import streamlit as st
+from PIL import Image
+
+# ---------------------------------------------------------
+# Add Project Root to Python Path
+# ---------------------------------------------------------
+
 sys.path.append(
     os.path.abspath(
         os.path.join(
@@ -10,61 +18,212 @@ sys.path.append(
         )
     )
 )
-import streamlit as st
-from PIL import Image
-import tempfile
-import os
 
 from inference.search import search_image
 
+# ---------------------------------------------------------
+# Streamlit Configuration
+# ---------------------------------------------------------
+
 st.set_page_config(
     page_title="Product Matching Framework",
+    page_icon="🛍️",
     layout="wide"
 )
 
+# ---------------------------------------------------------
+# Sidebar
+# ---------------------------------------------------------
+
+with st.sidebar:
+
+    st.title("📌 Project Details")
+
+    st.markdown("### Model")
+    st.write("Triplet Network (VGG16 Backbone)")
+
+    st.metric("Embedding Dimension", "128")
+    st.metric("Dataset Images", "139,521")
+    st.metric("Top Matches", "5")
+
+    st.markdown("### Search Engine")
+    st.write("FAISS")
+
+    st.markdown("### Dataset")
+    st.write("Stanford Online Products")
+
+    st.divider()
+
+    st.info(
+        """
+Upload any product image.
+
+The framework extracts deep visual features and retrieves
+the most visually similar products using FAISS similarity search.
+"""
+    )
+
+# ---------------------------------------------------------
+# Title
+# ---------------------------------------------------------
+
 st.title("🛍️ Product Matching Framework")
-st.write("Upload a product image to retrieve visually similar products.")
+
+st.markdown("""
+### Deep Metric Learning using Triplet Loss + FAISS
+
+Retrieve visually similar products using a **Triplet Network**
+trained with **Triplet Loss** and accelerated using
+**FAISS Approximate Nearest Neighbor Search**.
+""")
+
+st.info(
+"""
+This application generates image embeddings using a VGG16-based
+Triplet Network and performs efficient similarity search
+over the Stanford Online Products Dataset.
+"""
+)
+
+st.divider()
+
+# ---------------------------------------------------------
+# Upload Image
+# ---------------------------------------------------------
 
 uploaded_file = st.file_uploader(
-    "Choose a product image",
+    "Choose a Product Image",
     type=["jpg", "jpeg", "png", "JPG"]
 )
+
+# ---------------------------------------------------------
+# Search
+# ---------------------------------------------------------
 
 if uploaded_file is not None:
 
     image = Image.open(uploaded_file)
 
-    col1, col2 = st.columns([1,2])
+    left_col, right_col = st.columns([1.2, 1.8])
 
-    with col1:
-        st.subheader("Query Image")
-        st.image(image, use_container_width=True)
+    with left_col:
 
-    # Save uploaded image temporarily
-    temp_dir = tempfile.gettempdir()
-    temp_path = os.path.join(temp_dir, uploaded_file.name)
+        st.subheader("📷 Query Image")
 
-    image.save(temp_path)
+        st.image(
+            image,
+            use_container_width=True
+        )
 
-    with st.spinner("Searching similar products..."):
+    search_button = st.button(
+        "🔍 Search Similar Products",
+        use_container_width=True
+    )
 
-        results = search_image(temp_path, top_k=5)
+    if search_button:
 
-    with col2:
+        temp_path = os.path.join(
+            tempfile.gettempdir(),
+            uploaded_file.name
+        )
 
-        st.subheader("Top 5 Similar Products")
+        image.save(temp_path)
 
-        cols = st.columns(5)
+        start_time = time.time()
 
-        for i, result in enumerate(results):
+        with st.spinner("Searching similar products..."):
 
-            with cols[i]:
+            results = search_image(
+                temp_path,
+                top_k=5
+            )
 
-                st.image(
-                    result["image_path"],
-                    use_container_width=True
-                )
+        end_time = time.time()
 
-                st.caption(
-                    f"Distance : {result['distance']:.4f}"
-                )
+        medals = ["🥇", "🥈", "🥉", "🏅", "🏅"]
+
+        with right_col:
+
+            st.subheader("🎯 Top Similar Products")
+
+            st.success(
+                f"Retrieved {len(results)} products in {end_time-start_time:.2f} seconds"
+            )
+
+            for i, result in enumerate(results):
+
+                with st.container(border=True):
+
+                    st.subheader(
+                        f"{medals[i]} Match #{i+1}"
+                    )
+
+                    img_col, info_col = st.columns([1, 2])
+
+                    with img_col:
+
+                        st.image(
+                            result["image_path"],
+                            use_container_width=True
+                        )
+
+                    with info_col:
+
+                        similarity = result["score"] * 100
+
+                        st.metric(
+                            "Similarity Score",
+                            f"{similarity:.2f}%"
+                        )
+
+                        st.progress(
+                            min(similarity / 100, 1.0)
+                        )
+
+                        st.write("**Product ID**")
+                        st.code(result["product_id"])
+                        st.write("**Image Name**")
+                        st.write(result["image_name"])
+
+                        if similarity >= 99:
+
+                            st.success("Excellent Match")
+
+                        elif similarity >= 95:
+
+                            st.info("Very Good Match")
+
+                        elif similarity >= 90:
+
+                            st.warning("Good Match")
+
+                        else:
+
+                            st.error("Low Similarity")
+
+# ---------------------------------------------------------
+# Footer
+# ---------------------------------------------------------
+
+st.divider()
+
+st.markdown(
+"""
+
+
+**Technology Stack**
+
+- PyTorch
+- VGG16
+- Triplet Loss
+- FAISS
+- Streamlit
+
+**Dataset**
+
+Stanford Online Products Dataset
+
+---
+*Built as a Deep Metric Learning based Product Image Retrieval System.*
+"""
+)

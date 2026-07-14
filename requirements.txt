@@ -6,6 +6,6 @@ numpy
 pillow
 opencv-python
 matplotlib
-scikit-learn
 pandas
+scikit-learn
 tqdm

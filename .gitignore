@@ -1,26 +1,25 @@
-# Virtual Environment
-venv/
-
-# Python cache
+# Python
 __pycache__/
 *.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
 
 # Jupyter
 .ipynb_checkpoints/
 
-# Model weights
-saved_models/
-*.pth
+# VS Code
+.vscode/
 
-# Dataset (too large for Git)
-dataset/
+# OS
+.DS_Store
+Thumbs.db
 
 # Logs
 *.log
 
-# VS Code settings
-.vscode/
-
-# OS files
-.DS_Store
-Thumbs.db
+# Large dataset (hosted separately on Hugging Face Dataset)
+dataset/

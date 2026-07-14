@@ -151,9 +151,10 @@ def search_image(query_image, top_k=5):
         if idx == -1:
             continue
 
-        image_path = image_paths[idx]
-
+        relative_path = image_paths[idx]
+        image_path = os.path.join(PROJECT_ROOT,relative_path)
         image_name = os.path.basename(image_path)
+
 
         # Skip duplicate filenames
         if image_name in seen_images:
